@@ -1,0 +1,874 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{tikz}
+
+\usepackage{pgf-umlcd}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{adjustbox}
+
+% TikZ libraries
+\usetikzlibrary{arrows.meta, shapes, positioning, calc, decorations.pathreplacing, shadows.blur, backgrounds}
+
+% Configuration des marges
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% Couleurs professionnelles
+\definecolor{primaryBlue}{RGB}{0,84,147}
+\definecolor{secondaryBlue}{RGB}{0,112,192}
+\definecolor{accentGreen}{RGB}{0,128,0}
+\definecolor{accentOrange}{RGB}{255,140,0}
+\definecolor{lightGray}{RGB}{240,240,240}
+\definecolor{darkGray}{RGB}{80,80,80}
+\definecolor{tableHeader}{RGB}{0,84,147}
+\definecolor{codeBg}{RGB}{250,250,250}
+
+% Style des titres
+\titleformat{\chapter}{\normalfont\huge\bfseries\color{primaryBlue}}{\thechapter}{1em}{}
+\titleformat{\section}{\normalfont\Large\bfseries\color{secondaryBlue}}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries\color{darkGray}}{\thesubsection}{1em}{}
+
+% Style des listings
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{primaryBlue}\bfseries,
+    commentstyle=\color{accentGreen},
+    stringstyle=\color{accentOrange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    breaklines=true,
+    backgroundcolor=\color{codeBg},
+    rulecolor=\color{lightGray},
+    tabsize=2,
+    showspaces=false,
+    showstringspaces=false
+}
+
+% En-tête et pied de page
+\pagestyle{fancy}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\textcolor{primaryBlue}{RTSP Multi-Channel System}}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\textcolor{gray}{Ayoub Smayen}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\color{primaryBlue}\hrule width\headwidth height\headrulewidth}
+
+% Hyperliens
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryBlue,
+    urlcolor=secondaryBlue,
+    citecolor=accentGreen
+}
+
+% Commandes personnalisées
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\important}[1]{\textcolor{primaryBlue}{\textbf{#1}}}
+\newcommand{\success}[1]{\textcolor{accentGreen}{\textbf{#1}}}
+\newcommand{\warning}[1]{\textcolor{accentOrange}{\textbf{#1}}}
+
+% Environnement pour les encadrés
+\newenvironment{infobox}[1]{%
+    \begin{tcolorbox}[colback=lightGray!20, colframe=primaryBlue, title=#1, sharp corners]
+}{%
+    \end{tcolorbox}
+}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\begin{document}
+
+% ============================================================
+% PAGE DE GARDE
+% ============================================================
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+    
+    % Logo fictif
+    \begin{tikzpicture}
+        \draw[fill=primaryBlue, rounded corners] (0,0) rectangle (4,1.5);
+        \node[white, font=\Large\bfseries] at (2,0.75) {RTSP Stream};
+    \end{tikzpicture}
+    
+    \vspace{2cm}
+    
+    {\Huge\bfseries\color{primaryBlue} RAPPORT TECHNIQUE\\[0.3cm]}
+    {\huge\bfseries SYSTÈME MULTI-RTSP DYNAMIQUE\\[0.5cm]}
+    {\Large Serveur C++ (GStreamer) + Interface Python (PyQt)\\[0.3cm]
+     Rechargement dynamique}
+    
+    \vspace{2cm}
+    
+    \begin{tcolorbox}[colback=lightGray!30, colframe=primaryBlue, width=0.7\textwidth, sharp corners]
+        \begin{tabular}{p{3cm}p{8cm}}
+            \textbf{Réalisé par} & \textbf{Ayoub Smayen} \\
+            \textbf{Fonction} & Développeur C++ \\
+            \textbf{Spécialisation} & Streaming vidéo, architectures embarquées \\
+            \textbf{Technologies} & GStreamer, C++17, Python, PyQt, OpenCV \\
+            \textbf{Version} & 2.0 \\
+            \textbf{Date} & Avril 2026 \\
+        \end{tabular}
+    \end{tcolorbox}
+    
+    \vfill
+    
+    \begin{center}
+        \rule{0.8\textwidth}{0.5pt}\\
+        \textit{Document confidentiel - Tous droits réservés}
+    \end{center}
+\end{titlepage}
+
+% ============================================================
+% TABLE DES MATIERES
+% ============================================================
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+
+% ============================================================
+% CHAPITRE 1 : INTRODUCTION
+% ============================================================
+\chapter{Introduction}
+
+\section{Contexte et objectifs}
+
+Le protocole \important{RTSP (Real Time Streaming Protocol)} est un standard de l'industrie pour la diffusion de médias en temps réel. Ce projet consiste à développer une solution complète de diffusion et visualisation multi-flux RTSP.
+
+\begin{infobox}{Objectifs du projet}
+\begin{itemize}
+    \item Diffusion de flux vidéo multi-canal sur réseau local ou Internet
+    \item Compatibilité avec les lecteurs standards (VLC, FFplay, OBS)
+    \item Configuration dynamique \success{sans interruption du service}
+    \item Interface d'administration intuitive
+    \item Incrustation de texte personnalisée par canal
+\end{itemize}
+\end{infobox}
+
+\section{Architecture globale}
+
+Le système se décompose en deux parties indissociables :
+
+\begin{enumerate}
+    \item \important{Serveur RTSP multi-canal} (C++17 + GStreamer)
+    \begin{itemize}
+        \item Diffusion de flux vidéo (tests, fichiers, caméras)
+        \item Rechargement à chaud de la configuration
+        \item Incrustation texte et horodatage par canal
+    \end{itemize}
+    
+    \item \important{Interface de visualisation dynamique} (Python / PyQt + OpenCV)
+    \begin{itemize}
+        \item Chargement automatique des caméras depuis JSON
+        \item Mise à jour des flux sans redémarrage
+        \item Thread par caméra pour garantir la fluidité
+    \end{itemize}
+\end{enumerate}
+
+% ============================================================
+% CHAPITRE 2 : ÉTUDE D'EXISTANT
+% ============================================================
+\chapter{Étude d'existant}
+
+\section{Analyse comparative}
+
+\begin{table}[H]
+    \centering
+    \caption{Comparaison des solutions existantes}
+    \label{tab:existant}
+    \rowcolors{2}{lightGray!30}{white}
+    \begin{tabular}{|l|c|c|c|c|c|}
+        \hline
+        \rowcolor{primaryBlue!80}
+        \multicolumn{1}{|c|}{\color{white}\textbf{Solution}} & 
+        \color{white}\textbf{RTSP} & 
+        \color{white}\textbf{Multi-flux} & 
+        \color{white}\textbf{UI} & 
+        \color{white}\textbf{Reconfigurable} & 
+        \color{white}\textbf{Customisable} \\
+        \hline
+        VLC Media Player & \success{✅} & ❌ & \success{✅} & ❌ & ❌ \\
+        OpenCV seul & \success{✅} & \success{✅} & ❌ & ❌ & \success{✅} \\
+        ZoneMinder & \success{✅} & \success{✅} & \success{✅} & ❌ & ❌ \\
+        FFmpeg + SDL & \success{✅} & ❌ & ❌ & ❌ & \success{✅} \\
+        OBS Studio & \success{✅} & ❌ & \success{✅} & ❌ & ❌ \\
+        \hline
+        \rowcolor{accentGreen!20}
+        \textbf{Notre solution} & \success{✅} & \success{✅} & \success{✅} & \success{✅} & \success{✅} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{Conclusion}
+
+Aucune solution open-source simple ne combine :
+\begin{itemize}
+    \item Multi-RTSP temps réel
+    \item Interface utilisateur moderne
+    \item Rechargement dynamique sans coupure
+    \item Extensibilité (C++ pour le cœur, Python pour l'UI)
+\end{itemize}
+
+➡️ \important{D'où la pertinence de notre architecture hybride.}
+
+% ============================================================
+% CHAPITRE 3 : DIAGRAMME DE CAS D'UTILISATION
+% ============================================================
+\chapter{Diagramme de Cas d'Utilisation}
+
+\section{Diagramme UML}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        actor/.style={rectangle, draw=primaryBlue, fill=primaryBlue!10, minimum width=2cm, minimum height=0.8cm, rounded corners, font=\bfseries},
+        usecase/.style={rectangle, draw=secondaryBlue, fill=secondaryBlue!10, minimum width=3.5cm, minimum height=0.7cm, rounded corners, font=\small},
+        system/.style={rectangle, draw=primaryBlue, fill=white, minimum width=10cm, minimum height=7cm, rounded corners, dashed},
+        include/.style={->, >=stealth, thick, draw=accentOrange, dashed},
+        extend/.style={->, >=stealth, thick, draw=accentGreen, dashed}
+    ]
+        
+        % Système
+        \draw[system] (-5,-1) rectangle (5,-9);
+        \node[font=\large\bfseries, primaryBlue] at (0,-1.3) {Système RTSP Multi-Channel};
+        
+        % Acteurs
+        \node[actor] (admin) at (-7,-2) {Administrateur};
+        \node[actor] (viewer) at (-7,-5) {Spectateur};
+        \node[actor] (fs) at (7,-3) {Système Fichier};
+        
+        % Cas d'utilisation
+        \node[usecase] (start) at (-2,-2.5) {Démarrer serveur};
+        \node[usecase] (add) at (-2,-3.8) {Ajouter canal};
+        \node[usecase] (edit) at (-2,-5.1) {Modifier canal};
+        \node[usecase] (delete) at (-2,-6.4) {Supprimer canal};
+        
+        \node[usecase] (watch) at (2,-3.8) {Visualiser flux};
+        \node[usecase] (reload) at (2,-5.5) {Rechargement auto};
+        
+        \node[usecase] (config) at (2,-2.5) {Config JSON};
+        
+        % Associations Acteur -> UC
+        \draw[->, >=stealth, thick] (admin) -- (start);
+        \draw[->, >=stealth, thick] (admin) -- (add);
+        \draw[->, >=stealth, thick] (admin) -- (edit);
+        \draw[->, >=stealth, thick] (admin) -- (delete);
+        
+        \draw[->, >=stealth, thick] (viewer) -- (watch);
+        
+        % Associations UC -> Acteur
+        \draw[->, >=stealth, thick] (config) -- (fs);
+        \draw[->, >=stealth, thick] (reload) -- (fs);
+        
+        % Inclusions
+        \draw[include] (add) -- (config);
+        \draw[include] (edit) -- (config);
+        \draw[include] (delete) -- (config);
+        
+        \draw[include] (reload) -- (config);
+        
+    \end{tikzpicture}
+    \caption{Diagramme de cas d'utilisation}
+    \label{fig:usecase}
+\end{figure}
+
+\section{Description des cas d'utilisation}
+
+\begin{table}[H]
+    \centering
+    \caption{Cas d'utilisation - Administrateur}
+    \label{tab:uc_admin}
+    \begin{tabular}{|p{2.5cm}|p{10cm}|}
+        \hline
+        \rowcolor{primaryBlue!80}
+        \multicolumn{2}{|c|}{\color{white}\textbf{UC-01 : Démarrer le serveur RTSP}} \\
+        \hline
+        \textbf{Acteur principal} & Administrateur \\
+        \textbf{Pré-condition} & Exécutable compilé, fichier config valide \\
+        \textbf{Post-condition} & Serveur actif, canaux disponibles en RTSP \\
+        \textbf{Scénario nominal} & 1. L'admin lance la GUI\\
+        & 2. Il clique sur "Démarrer serveur"\\
+        & 3. Le serveur C++ se lance\\
+        & 4. Les flux deviennent accessibles \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% ============================================================
+% CHAPITRE 4 : DIAGRAMME DE SÉQUENCE
+% ============================================================
+\chapter{Diagramme de Séquence}
+
+\section{Rechargement automatique de la configuration}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[>=stealth, font=\small]
+        
+        % Définition des lignes de vie
+        \begin{umlseqdiagram}
+            \umlactor[class=Administrateur]{admin}
+            \umlobject[class=Système Fichier]{fs}
+            \umlobject[class=ConfigWatcher (C++)]{watcher}
+            \umlobject[class=RTSPServerManager]{server}
+            \umlobject[class=GstRTSPMountPoints]{mounts}
+            
+            \begin{umlcall}[op={modifie rtsp\_config.json}]{admin}{fs}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={événement modification}, type=asynchronous]{fs}{watcher}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={reload\_config()}]{watcher}{server}
+                \begin{umlcall}[op={compare(old, new)}]{server}{server}
+                \end{umlcall}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={remove\_factory(anciens)}]{server}{mounts}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={add\_factory(nouveaux)}]{server}{mounts}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={return OK}]{mounts}{server}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={log("Config rechargée")}]{server}{watcher}
+            \end{umlcall}
+            
+        \end{umlseqdiagram}
+        
+    \end{tikzpicture}
+    \caption{Diagramme de séquence - Rechargement serveur}
+    \label{fig:sequence_server}
+\end{figure}
+
+\section{Rechargement côté visualisation PyQt}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[>=stealth, font=\small]
+        
+        \begin{umlseqdiagram}
+            \umlactor[class=Administrateur]{admin}
+            \umlobject[class=watchdog (Python)]{watchdog}
+            \umlobject[class=ConfigManager]{config}
+            \umlobject[class=MultiRTSPWindow]{window}
+            \umlobject[class=CameraStream (Thread)]{thread}
+            
+            \begin{umlcall}[op={modifie cameras.json}]{admin}{watchdog}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={on\_modified()}, type=asynchronous]{watchdog}{config}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={load()}]{config}{config}
+            \end{umlcall}
+            
+            \begin{umlcall}[op={reload\_config()}]{config}{window}
+                \begin{umlcall}[op={compare(old, new)}]{window}{window}
+                \end{umlcall}
+                
+                \begin{umlcall}[op={stop()}, type=asynchronous]{window}{thread}
+                \end{umlcall}
+                
+                \begin{umlcall}[op={start()}, type=asynchronous]{window}{thread}
+                \end{umlcall}
+                
+                \begin{umlcall}[op={update\_UI()}]{window}{window}
+                \end{umlcall}
+            \end{umlcall}
+            
+        \end{umlseqdiagram}
+        
+    \end{tikzpicture}
+    \caption{Diagramme de séquence - Rechargement visualisation}
+    \label{fig:sequence_viewer}
+\end{figure}
+
+% ============================================================
+% CHAPITRE 5 : DIAGRAMME DE CLASSES
+% ============================================================
+\chapter{Diagramme de Classes}
+
+\section{Classes du serveur C++}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        class/.style={rectangle, draw=primaryBlue, fill=primaryBlue!10, minimum width=5cm, align=left, rounded corners, inner sep=5pt},
+        attribute/.style={font=\small\itshape},
+        method/.style={font=\small},
+        relation/.style={-{Triangle[open]}, thick, draw=accentOrange}
+    ]
+        
+        % Classe ChannelConfig
+        \node[class] (config) at (0,0) {
+            \textbf{<<struct>> ChannelConfig}\\
+            \hline
+            \attribute{- id : int}\\
+            \attribute{- name : string}\\
+            \attribute{- mount : string}\\
+            \attribute{- source : string}\\
+            \attribute{- text\_overlay : string}\\
+            \attribute{- enabled : bool}\\
+        };
+        
+        % Classe RTSPServerManager
+        \node[class] (manager) at (6,-3) {
+            \textbf{RTSPServerManager}\\
+            \hline
+            \attribute{- server\_ : GstRTSPServer*}\\
+            \attribute{- mounts\_ : GstRTSPMountPoints*}\\
+            \attribute{- port : int}\\
+            \attribute{- host : string}\\
+            \hline
+            \method{+ init() : bool}\\
+            \method{+ add\_channel(cfg) : void}\\
+            \method{+ remove\_channel(mount) : void}\\
+            \method{+ load\_channels() : void}\\
+            \method{+ start() : void}\\
+            \method{+ stop() : void}\\
+        };
+        
+        % Classe ConfigWatcher
+        \node[class] (watcher) at (-5,-3) {
+            \textbf{ConfigWatcher}\\
+            \hline
+            \attribute{- path : string}\\
+            \attribute{- last\_mtime : time\_t}\\
+            \attribute{- running : bool}\\
+            \hline
+            \method{+ start() : void}\\
+            \method{+ stop() : void}\\
+            \method{- check\_update() : void}\\
+        };
+        
+        % Relations
+        \draw[relation] (manager) -- node[above, sloped] {utilise 1..*} (config);
+        \draw[relation] (watcher) -- node[above, sloped] {notifie} (manager);
+        
+    \end{tikzpicture}
+    \caption{Diagramme de classes - Serveur C++}
+    \label{fig:classes_cpp}
+\end{figure}
+
+\section{Classes de l'interface visualisation (PyQt)}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        class/.style={rectangle, draw=secondaryBlue, fill=secondaryBlue!10, minimum width=6cm, align=left, rounded corners, inner sep=5pt},
+        qtclass/.style={rectangle, draw=accentGreen, fill=accentGreen!10, minimum width=6cm, align=left, rounded corners, inner sep=5pt},
+        relation/.style={-{Triangle[open]}, thick, draw=accentOrange},
+        composition/.style={-{Diamond[fill=black]}, thick, draw=primaryBlue}
+    ]
+        
+        % Classe CameraStream
+        \node[qtclass] (camera) at (0,0) {
+            \textbf{CameraStream (QThread)}\\
+            \hline
+            \attribute{- url : str}\\
+            \attribute{- frame : np.ndarray}\\
+            \attribute{- running : bool}\\
+            \hline
+            \method{+ run() : void}\\
+            \method{+ stop() : void}\\
+            \method{+ reconnect() : void}\\
+        };
+        
+        % Classe ConfigManager
+        \node[class] (config) at (-5,-4) {
+            \textbf{ConfigManager}\\
+            \hline
+            \attribute{- path : str}\\
+            \attribute{- data : dict}\\
+            \hline
+            \method{+ load() : dict}\\
+            \method{+ save() : bool}\\
+            \method{+ compare(old,new) : bool}\\
+        };
+        
+        % Classe MultiRTSPWindow
+        \node[class] (window) at (4,-4) {
+            \textbf{MultiRTSPWindow (QMainWindow)}\\
+            \hline
+            \attribute{- cameras : dict}\\
+            \attribute{- labels : dict}\\
+            \attribute{- config\_mgr : ConfigManager}\\
+            \hline
+            \method{+ load\_config() : void}\\
+            \method{+ update\_frames() : void}\\
+            \method{+ check\_config\_update() : void}\\
+            \method{- add\_camera\_widget() : void}\\
+            \method{- remove\_camera\_widget() : void}\\
+        };
+        
+        % Classe ConfigFileHandler
+        \node[class] (handler) at (-5,-7) {
+            \textbf{ConfigFileHandler}\\
+            \hline
+            \attribute{- path : str}\\
+            \attribute{- callback : callable}\\
+            \hline
+            \method{+ on\_modified(event) : void}\\
+        };
+        
+        % Relations
+        \draw[composition] (window) -- node[above, sloped] {1..*} (camera);
+        \draw[relation] (window) -- node[above, sloped] {1} (config);
+        \draw[relation] (handler) -- node[above, sloped] {notifie} (config);
+        
+    \end{tikzpicture}
+    \caption{Diagramme de classes - Visualisation PyQt}
+    \label{fig:classes_python}
+\end{figure}
+
+% ============================================================
+% CHAPITRE 6 : ARCHITECTURE
+% ============================================================
+\chapter{Architecture du Système}
+
+\section{Vue d'ensemble}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        block/.style={rectangle, draw=primaryBlue, fill=primaryBlue!10, minimum width=3cm, minimum height=1cm, align=center, rounded corners, drop shadow},
+        component/.style={rectangle, draw=secondaryBlue, fill=secondaryBlue!10, minimum width=2.5cm, minimum height=0.8cm, align=center, rounded corners},
+        arrow/.style={->, >=stealth, thick, draw=accentOrange},
+        datalink/.style={<->, >=stealth, thick, draw=accentGreen}
+    ]
+        
+        % Clients
+        \node[block] (vlc) at (0,5) {Client VLC\\\small Spectateur};
+        \node[block] (pyqt) at (4,5) {Client PyQt\\\small Visualisateur};
+        
+        % Serveur
+        \node[block] (server) at (2,2.5) {Serveur RTSP C++\\\small GStreamer};
+        
+        % Configuration
+        \node[block] (config) at (2,0) {Fichier JSON\\\small Configuration};
+        
+        % GUI Admin
+        \node[block] (gui) at (-3,0) {GUI Tkinter\\\small Administration};
+        
+        % Sources
+        \node[component] (source1) at (-2,4) {Source Test};
+        \node[component] (source2) at (0,4) {Fichier vidéo};
+        \node[component] (source3) at (2,4) {Caméra IP};
+        \node[component] (source4) at (4,4) {Flux RTSP externe};
+        
+        % Flèches
+        \draw[arrow] (source1) -- (server);
+        \draw[arrow] (source2) -- (server);
+        \draw[arrow] (source3) -- (server);
+        \draw[arrow] (source4) -- (server);
+        
+        \draw[arrow] (server) -- (vlc);
+        \draw[arrow] (server) -- (pyqt);
+        
+        \draw[datalink] (server) -- (config);
+        \draw[datalink] (gui) -- (config);
+        
+    \end{tikzpicture}
+    \caption{Architecture générale du système}
+    \label{fig:architecture}
+\end{figure}
+
+\section{Pipeline GStreamer}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        element/.style={rectangle, draw=primaryBlue, fill=primaryBlue!15, minimum height=0.8cm, align=center, rounded corners, font=\small},
+        arrow/.style={->, >=stealth, thick, draw=accentOrange}
+    ]
+        
+        \node[element] (src) at (0,0) {videotestsrc\\\tiny pattern=0};
+        \node[element] (caps) at (2.2,0) {caps filter\\\tiny video/x-raw};
+        \node[element] (clock) at (4.4,0) {clockoverlay\\\tiny horodatage};
+        \node[element] (text) at (6.6,0) {textoverlay\\\tiny texte personnalisé};
+        \node[element] (conv) at (8.8,0) {videoconvert};
+        \node[element] (enc) at (11,0) {x264enc\\\tiny H.264};
+        \node[element] (pay) at (13.2,0) {rtph264pay\\\tiny RTP};
+        
+        \draw[arrow] (src) -- (caps);
+        \draw[arrow] (caps) -- (clock);
+        \draw[arrow] (clock) -- (text);
+        \draw[arrow] (text) -- (conv);
+        \draw[arrow] (conv) -- (enc);
+        \draw[arrow] (enc) -- (pay);
+        
+    \end{tikzpicture}
+    \caption{Pipeline GStreamer par canal}
+    \label{fig:pipeline}
+\end{figure}
+
+% ============================================================
+% CHAPITRE 7 : INSTALLATION
+% ============================================================
+\chapter{Installation et Déploiement}
+
+\section{Prérequis}
+
+\begin{table}[H]
+    \centering
+    \caption{Prérequis par plateforme}
+    \label{tab:prerequis}
+    \begin{tabular}{|l|l|l|l|}
+        \hline
+        \rowcolor{primaryBlue!80}
+        \multicolumn{1}{|c|}{\color{white}\textbf{Composant}} & 
+        \color{white}\textbf{Windows} & 
+        \color{white}\textbf{Linux} & 
+        \color{white}\textbf{macOS} \\
+        \hline
+        GStreamer & \code{gstreamer-1.0.msi} & \code{apt install} & \code{brew install} \\
+        CMake & \code{cmake-3.16+.msi} & \code{apt install} & \code{brew install} \\
+        Python & \code{python-3.10+.exe} & \code{apt install} & \code{brew install} \\
+        OpenCV & \code{pip install} & \code{pip install} & \code{pip install} \\
+        PyQt5 & \code{pip install} & \code{pip install} & \code{pip install} \\
+        watchdog & \code{pip install} & \code{pip install} & \code{pip install} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{Compilation}
+
+\subsection{Linux / macOS}
+\begin{lstlisting}[language=bash, caption=Compilation sous Linux/macOS]
+# Installation des dépendances
+sudo apt install libgstreamer1.0-dev libgstreamer-rtsp-server-1.0-dev
+sudo apt install cmake build-essential python3 python3-pip
+
+# Compilation
+cmake -B build
+cmake --build build
+
+# Lancement
+./build/rtsp_server config/rtsp_config.json
+\end{lstlisting}
+
+\subsection{Windows}
+\begin{lstlisting}[language=batch, caption=Compilation sous Windows]
+cmake -B build -DGST_ROOT="C:/Program Files/gstreamer/1.0/msvc_x86_64"
+cmake --build build --config Release
+
+# Lancement
+.\build\Release\rtsp_server.exe config\rtsp_config.json
+\end{lstlisting}
+
+% ============================================================
+% CHAPITRE 8 : TESTS
+% ============================================================
+\chapter{Plan de Tests}
+
+\begin{table}[H]
+    \centering
+    \caption{Plan de tests fonctionnels}
+    \label{tab:tests}
+    \rowcolors{2}{lightGray!20}{white}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{|c|l|l|c|}
+        \hline
+        \rowcolor{primaryBlue!80}
+        \multicolumn{1}{|c|}{\color{white}\textbf{ID}} & 
+        \color{white}\textbf{Cas de test} & 
+        \color{white}\textbf{Résultat attendu} & 
+        \color{white}\textbf{Statut} \\
+        \hline
+        T-01 & Démarrer serveur sans config & Message d'erreur & \success{✅ OK} \\
+        T-02 & 3 canaux simultanés & URLs accessibles & \success{✅ OK} \\
+        T-03 & Modification du port & Redémarrage sur nouveau port & \success{✅ OK} \\
+        T-04 & Ajout canal via GUI & Visible en < 3s & \success{✅ OK} \\
+        T-05 & Désactivation canal & Non accessible & \success{✅ OK} \\
+        T-06 & Modification overlay texte & Changement instantané & \success{✅ OK} \\
+        T-07 & 10 flux simultanés & Stable < 200ms & \success{✅ OK} \\
+        T-08 & Ouverture VLC depuis GUI & VLC lance le flux & \success{✅ OK} \\
+        T-09 & Copie URL & URL dans presse-papier & \success{✅ OK} \\
+        T-10 & Arrêt propre & Clients déconnectés & \success{✅ OK} \\
+        T-11 & Rechargement config & Changements < 3s & \success{✅ OK} \\
+        T-12 & Chargement cameras.json & Flux affichés & \success{✅ OK} \\
+        T-13 & PyQt - Ajout caméra & Nouveau flux apparaît & \success{✅ OK} \\
+        T-14 & Reconnexion auto & Reconnexion après perte & \success{✅ OK} \\
+        \hline
+    \end{tabular}
+    \end{adjustbox}
+\end{table}
+
+% ============================================================
+% CHAPITRE 9 : CONCLUSION
+% ============================================================
+\chapter{Conclusion}
+
+\section{Bilan}
+
+Ce projet apporte une \important{réponse complète et innovante} au besoin de diffusion et de visualisation multi-flux RTSP avec reconfiguration dynamique.
+
+\section{Points forts}
+
+\begin{itemize}
+    \item \success{Séparation des responsabilités} : cœur performant en C++, interface flexible en Python
+    \item \success{Rechargement à chaud} des deux côtés (serveur et visualisation)
+    \item \success{Compatibilité standards} : VLC, FFplay, OBS
+    \item \success{Extensibilité} : facile d'ajouter des fonctionnalités
+    \item \success{Multiplateforme} : Windows, Linux, macOS
+\end{itemize}
+
+\section{Apport personnel}
+
+\begin{infobox}{Ayoub Smayen – Développeur C++}
+En tant que développeur C++, j'ai conçu et implémenté :
+\begin{itemize}
+    \item Le serveur RTSP basé sur \code{gst-rtsp-server}
+    \item Le watcher de fichier config avec rechargement sans interruption
+    \item Le pipeline GStreamer optimisé pour la faible latence
+    \item L'interface Python/PyQt pour la visualisation dynamique
+    \item L'interface Tkinter pour l'administration
+\end{itemize}
+\end{infobox}
+
+\section{Évolutions prévues}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        \rowcolor{primaryBlue!80}
+        \color{white}\textbf{Fonctionnalité} & \color{white}\textbf{Statut} \\
+        \hline
+        Support caméras IP natives (rtspsrc) & \warning{�� Prévu} \\
+        Authentification RTSP & \warning{�� Prévu} \\
+        Enregistrement des flux & \warning{�� Prévu} \\
+        Interface web (Flask + WebSockets) & \warning{�� Prévu} \\
+        Détection de mouvement (OpenCV) & \warning{�� Prévu} \\
+        Notification en cas de perte de flux & \warning{�� Prévu} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% ============================================================
+% ANNEXES
+% ============================================================
+\chapter*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes}
+
+\section*{Annexe A : Extrait de code – Serveur C++}
+\addcontentsline{toc}{section}{Annexe A : Extrait de code – Serveur C++}
+
+\begin{lstlisting}[language=c++, caption=RTSPServerManager.cpp]
+void RTSPServerManager::add_channel(const ChannelConfig& cfg) {
+    if (!cfg.enabled) return;
+    
+    GstRTSPMediaFactory* factory = gst_rtsp_media_factory_new();
+    
+    std::string pipeline = cfg.source;
+    if (cfg.source == "videotestsrc") {
+        pipeline += " pattern=" + std::to_string(cfg.pattern);
+    }
+    pipeline += " ! video/x-raw ! clockoverlay ! textoverlay text=\"" + 
+                cfg.text_overlay + "\" ! videoconvert ! x264enc ! rtph264pay name=pay0 pt=96";
+    
+    gst_rtsp_media_factory_set_launch(factory, pipeline.c_str());
+    gst_rtsp_media_factory_set_shared(factory, TRUE);
+    
+    gst_rtsp_mount_points_add_factory(mounts_, cfg.mount.c_str(), factory);
+    g_object_unref(factory);
+    
+    g_print("✅ Canal ajoute : %s -> %s\n", cfg.name.c_str(), cfg.mount.c_str());
+}
+\end{lstlisting}
+
+\section*{Annexe B : Extrait de code – Visualisation PyQt}
+\addcontentsline{toc}{section}{Annexe B : Extrait de code – Visualisation PyQt}
+
+\begin{lstlisting}[language=python, caption=camera_stream.py]
+import cv2
+from PyQt5.QtCore import QThread, pyqtSignal, QMutex
+
+class CameraStream(QThread):
+    frame_updated = pyqtSignal(object)
+    
+    def __init__(self, url: str, parent=None):
+        super().__init__(parent)
+        self.url = url
+        self.running = True
+        self.mutex = QMutex()
+        
+    def run(self):
+        cap = cv2.VideoCapture(self.url)
+        while self.running:
+            ret, frame = cap.read()
+            if ret:
+                self.frame_updated.emit(frame)
+            else:
+                cap.release()
+                self.msleep(1000)
+                cap = cv2.VideoCapture(self.url)
+        cap.release()
+    
+    def stop(self):
+        self.mutex.lock()
+        self.running = False
+        self.mutex.unlock()
+\end{lstlisting}
+
+\section*{Annexe C : Fichier de configuration JSON}
+\addcontentsline{toc}{section}{Annexe C : Fichier de configuration JSON}
+
+\begin{lstlisting}[language=json, caption=rtsp_config.json]
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8554
+  },
+  "channels": [
+    {
+      "id": 1,
+      "name": "Camera_Principale",
+      "mount": "/main",
+      "source": "videotestsrc",
+      "pattern": 18,
+      "text_overlay": "Live - Camera Principale",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "Camera_Secondaire",
+      "mount": "/secondary",
+      "source": "filesrc location=/home/video/test.mp4 ! decodebin",
+      "pattern": 0,
+      "text_overlay": "Replay - Camera Secondaire",
+      "enabled": true
+    }
+  ]
+}
+\end{lstlisting}
+
+% ============================================================
+% FIN
+% ============================================================
+\end{document}

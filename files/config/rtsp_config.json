@@ -30,6 +30,15 @@
       "pattern": 18,
       "text_overlay": "Channel 3 - Live",
       "enabled": true
+    },
+    {
+      "id": 4,
+      "name": "Channel_4",
+      "mount": "/stream4",
+      "source": "videotestsrc",
+      "pattern": 3,
+      "text_overlay": "Canal 4 \u2014 Live",
+      "enabled": true
     }
   ]
 }
