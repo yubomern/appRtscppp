@@ -5,12 +5,12 @@ int main() {
 
     db.createTable();
 
-    db.insertUser("Alice");
-    db.insertUser("Bob");
+    db.insertUser("AYOUB");
+    db.insertUser("DOUAA");
 
     db.getUsers();
 
-    db.updateUser(1, "Alice Updated");
+    db.updateUser(1, "Ayoub Updated");
 
     db.deleteUser(2);
 
