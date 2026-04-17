@@ -1,0 +1,152 @@
+// ConsoleApplication5.cpp : Ce fichier contient la fonction 'main'. L'exécution du programme commence et se termine à cet endroit.
+//
+
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <future>
+#include <vector>
+#include <thread>
+#include <map>
+#include <functional>
+#include <algorithm>
+#include <stdexcept>
+#if defined (_WIN32)
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <Windows.h>
+#pragma comment(lib,"Ws2_32.lib")
+#else 
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+
+#endif 
+
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+
+
+namespace net = boost::asio;
+namespace http = boost::beast::http;
+
+using tcp = net::ip::tcp;
+
+
+
+#define MAX_BUFFER 1024 
+
+std::mutex mtx_;
+void handle_client(int client_socket, int clinet_id, char* msg)
+{
+
+    {
+        std::lock_guard<std::mutex> lk(mtx_);
+        std::cout << "clinet " << clinet_id << std::endl;
+    }
+    char buffer[MAX_BUFFER] = { 0 };
+    int n = recv(client_socket, buffer, sizeof(buffer), 0);
+
+    if (n <= 0) { std::cout << "error lance " << std::endl; return; }
+    buffer[n] = '\0';
+    send(client_socket, msg, sizeof(msg), 0);
+    closesocket(client_socket);
+
+    {
+
+        std::lock_guard<std::mutex> lk_(mtx_);
+        std::cout << "client id " << clinet_id << std::endl;
+
+    }
+}
+#include <cctype>
+
+std::string  trim_func(const std::string& str)
+{
+    auto find_non_space = std::find_if_not(str.begin(), str.end(), [](unsigned char f) {
+        return std::isspace(f);
+        });
+
+    if (find_non_space == str.end()) return  "";
+
+    auto last_non_space = std::find_if_not(str.rbegin(), str.rend(), [](unsigned char c) {
+        return std::isspace(c);
+        }).base();
+    return  std::string(find_non_space, last_non_space);
+
+}
+
+
+using predicate = std::function<int(int)>;
+
+
+
+static inline void ltrim(std::string& str, predicate const& pred = isspace)
+{
+    str.erase(str.begin(), std::find_if_not(str.begin(), str.end(), pred));
+
+}
+
+static inline void rtrim(std::string& str, predicate const& pred) {
+
+    str.erase(std::find_if_not(str.rbegin(), str.rend(), pred).base(), str.end());
+
+
+}
+
+static inline void trim_(std::string& c, predicate const& pred = isspace)
+{
+    ltrim(c, pred);
+    rtrim(c, pred);
+}
+
+int main_server() {
+
+    SOCKET SOCKET = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in serveice_in;
+    int addr_in = sizeof(serveice_in);
+    int port = 8083;
+
+    return 1;
+
+}
+
+
+void add(int& v)
+{
+    std::cout << " v = " << v << std::endl;
+}
+
+void add(int&& v)
+{
+
+    std::cout << "processing rvalue" << std::endl;
+}
+
+
+template <typename T >
+void wrapper(T&& t) {
+    process(std::forward<T>(t));
+}
+
+
+
+
+int main()
+{
+    std::string  username = " ayoub     smayen     1122";
+    std::string u = trim_func(username);
+    std::cout << "Hello World!\n" + u << std::endl;
+}
+
+// Exécuter le programme : Ctrl+F5 ou menu Déboguer > Exécuter sans débogage
+// Déboguer le programme : F5 ou menu Déboguer > Démarrer le débogage
+
+// Astuces pour bien démarrer : 
+//   1. Utilisez la fenêtre Explorateur de solutions pour ajouter des fichiers et les gérer.
+//   2. Utilisez la fenêtre Team Explorer pour vous connecter au contrôle de code source.
+//   3. Utilisez la fenêtre Sortie pour voir la sortie de la génération et d'autres messages.
+//   4. Utilisez la fenêtre Liste d'erreurs pour voir les erreurs.
+//   5. Accédez à Projet > Ajouter un nouvel élément pour créer des fichiers de code, ou à Projet > Ajouter un élément existant pour ajouter des fichiers de code existants au projet.
+//   6. Pour rouvrir ce projet plus tard, accédez à Fichier > Ouvrir > Projet et sélectionnez le fichier .sln.
