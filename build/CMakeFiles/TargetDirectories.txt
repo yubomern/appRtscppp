@@ -1,0 +1,3 @@
+C:/Users/hp/Desktop/appgithub/build/CMakeFiles/code_rtsp.dir
+C:/Users/hp/Desktop/appgithub/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/hp/Desktop/appgithub/build/CMakeFiles/ZERO_CHECK.dir

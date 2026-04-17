@@ -1,0 +1,35 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8554
+  },
+  "channels": [
+    {
+      "id": 1,
+      "name": "Channel_1",
+      "mount": "/stream1",
+      "source": "videotestsrc",
+      "pattern": 0,
+      "text_overlay": "Channel 1 - Live",
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "name": "Channel_2",
+      "mount": "/stream2",
+      "source": "videotestsrc",
+      "pattern": 1,
+      "text_overlay": "Channel 2 - Live",
+      "enabled": true
+    },
+    {
+      "id": 3,
+      "name": "Channel_3",
+      "mount": "/stream3",
+      "source": "videotestsrc",
+      "pattern": 18,
+      "text_overlay": "Channel 3 - Live",
+      "enabled": true
+    }
+  ]
+}

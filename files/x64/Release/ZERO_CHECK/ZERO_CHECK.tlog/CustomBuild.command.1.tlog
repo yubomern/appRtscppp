@@ -1,0 +1,10 @@
+^C:\USERS\HP\DESKTOP\APPGITHUB\FILES\CMAKEFILES\4BA657B3259FB991FB1CF53A70D7F3C3\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/hp/Desktop/appgithub -BC:/Users/hp/Desktop/appgithub/files --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/hp/Desktop/appgithub/files/GStreamerAudioTutorial.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

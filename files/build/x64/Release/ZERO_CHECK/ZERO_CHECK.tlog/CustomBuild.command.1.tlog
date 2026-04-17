@@ -1,0 +1,10 @@
+^C:\USERS\HP\DESKTOP\APPGITHUB\FILES\BUILD\CMAKEFILES\FF031CD330D56D38E660DD4EAD9620C2\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/hp/Desktop/appgithub/files -BC:/Users/hp/Desktop/appgithub/files/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/hp/Desktop/appgithub/files/build/RTSPMultiChannelServer.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
